@@ -1,2 +1,16 @@
 #Visual Studio
 .vs/
+
+#Build directories
+bin/
+obj/
+
+#User-specific files
+*.user
+*.suo
+
+#Secret configuration (local)
+appsettings.Development.json
+
+#Log files
+*.log
