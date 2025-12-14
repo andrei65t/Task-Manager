@@ -1,16 +1,19 @@
-#Visual Studio
-.vs/
-
-#Build directories
+# --- C# / .NET Core ---
 bin/
 obj/
 
-#User-specific files
+# --- Visual Studio ---
+.vs/
 *.user
 *.suo
 
-#Secret configuration (local)
-appsettings.Development.json
+# --- Docker ---
+docker-compose.override.yml
+.env
 
-#Log files
+# --- Sistem de Operare ---
+Thumbs.db
+.DS_Store
+
+# --- Diverse ---
 *.log
