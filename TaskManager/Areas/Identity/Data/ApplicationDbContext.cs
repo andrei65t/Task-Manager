@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using TaskManager.Areas.Identity.Data;
+using TaskManager.Models;
 
 namespace TaskManager.Data;
 
@@ -12,6 +13,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
         : base(options)
     {
     }
+
+    public DbSet<ProjectTask> ProjectTasks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

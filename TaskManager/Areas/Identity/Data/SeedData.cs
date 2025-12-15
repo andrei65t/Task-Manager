@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using TaskManager.Areas.Identity.Data;
 using TaskManager.Data;
+using TaskManager.Models;
 
 public static class SeedData
 {
@@ -67,6 +68,36 @@ public static class SeedData
 
                     RoleId = "4aa12e41-b16f-432a-8166-62fe0543d1ef",
                     UserId = "5b54ca8a-aba8-49bd-9a6e-503ae66fd5d1"
+                }
+            );
+
+            // Seed Tasks
+            context.ProjectTasks.AddRange(
+                new ProjectTask
+                {
+                    Title = "Initial Task 1",
+                    Description = "This is the first seeded task.",
+                    Status = TaskManager.Models.TaskStatus.NotStarted,
+                    StartDate = DateTime.Now,
+                    EndDate = DateTime.Now.AddDays(5)
+                },
+                new ProjectTask
+                {
+                    Title = "Initial Task 2",
+                    Description = "This is the second seeded task.",
+                    Status = TaskManager.Models.TaskStatus.InProgress,
+                    StartDate = DateTime.Now.AddDays(-2),
+                    EndDate = DateTime.Now.AddDays(3),
+                    MediaUrl = "https://www.youtube.com/embed/PErrvYtVzbk"
+                },
+                new ProjectTask
+                {
+                    Title = "Cat in a fish bowl",
+                    Description = "A funny video of a cat stuck in a fish bowl.",
+                    Status = TaskManager.Models.TaskStatus.Completed,
+                    StartDate = DateTime.Now.AddDays(-10),
+                    EndDate = DateTime.Now.AddDays(-5),
+                    MediaUrl = "https://www.youtube.com/embed/9FjGP4t2zKY"
                 }
             );
                             

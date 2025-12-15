@@ -1,0 +1,121 @@
+@model TaskManager.Models.ProjectTask
+
+@{ ViewData["Title"] = "Task Nou"; }
+
+<div class="container mt-5 mb-5">
+    
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow fade-in-up" style="border-radius: 15px; border: none;">
+            <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="task-container fade-in-up">
+        <div class="task-header">
+            <h2>
+                <i class="bi bi-plus-circle"></i> Adaugă Task Nou
+            </h2>
+        </div>
+        
+        <form asp-action="New" method="post" enctype="multipart/form-data">
+            
+            
+
+            <div class="mb-4">
+                <label asp-for="Title" class="form-label">
+                    <i class="bi bi-card-heading"></i> Titlu Task
+                </label>
+                <input asp-for="Title" class="form-control" placeholder="Introdu un titlu descriptiv..." />
+                <span asp-validation-for="Title" class="text-danger"></span>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Description" class="form-label">
+                    <i class="bi bi-file-text"></i> Descriere
+                </label>
+                <textarea asp-for="Description" class="form-control" rows="5" placeholder="Descrie task-ul în detaliu..."></textarea>
+                <span asp-validation-for="Description" class="text-danger"></span>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label asp-for="StartDate" class="form-label">
+                        <i class="bi bi-calendar-event"></i> Data de Început
+                    </label>
+                    <input asp-for="StartDate" type="date" class="form-control" />
+                    <span asp-validation-for="StartDate" class="text-danger"></span>
+                </div>
+                <div class="col-md-6">
+                    <label asp-for="EndDate" class="form-label">
+                        <i class="bi bi-flag-fill"></i> Termen Limită
+                    </label>
+                    <input asp-for="EndDate" type="date" class="form-control" />
+                    <span asp-validation-for="EndDate" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label asp-for="Status" class="form-label">
+                    <i class="bi bi-list-check"></i> Status
+                </label>
+                <select asp-for="Status" class="form-select" asp-items="Html.GetEnumSelectList<TaskManager.Models.TaskStatus>()">
+                    <option value="">Selectează statusul...</option>
+                </select>
+            </div>
+
+            <div class="media-upload-section">
+                <h5>
+                    <i class="bi bi-camera"></i> Adaugă Media (opțional)
+                </h5>
+                
+                <ul class="nav nav-tabs mb-3" id="mediaTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="image-tab" data-bs-toggle="tab" data-bs-target="#image-content" type="button" role="tab">
+                            <i class="bi bi-image"></i> Imagine
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="video-tab" data-bs-toggle="tab" data-bs-target="#video-content" type="button" role="tab">
+                            <i class="bi bi-youtube"></i> Video YouTube
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="mediaTabContent">
+                    <div class="tab-pane fade show active" id="image-content" role="tabpanel">
+                        <label asp-for="TaskImage" class="form-label">Încarcă o imagine</label>
+                        <input asp-for="TaskImage" type="file" class="form-control" accept="image/*" />
+                        <span asp-validation-for="TaskImage" class="text-danger"></span>
+                        <small class="text-muted d-block mt-2">
+                            <i class="bi bi-info-circle"></i> Formate acceptate: JPG, PNG, GIF (max 5MB)
+                        </small>
+                    </div>
+                    <div class="tab-pane fade" id="video-content" role="tabpanel">
+                        <label asp-for="MediaUrl" class="form-label">Link YouTube</label>
+                        <input asp-for="MediaUrl" class="form-control" placeholder="https://www.youtube.com/watch?v=..." />
+                        <span asp-validation-for="MediaUrl" class="text-danger"></span>
+                        <small class="text-muted d-block mt-2">
+                            <i class="bi bi-info-circle"></i> Copiază link-ul complet din browser
+                        </small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex gap-3 mt-4">
+                <button type="submit" class="btn btn-success-custom btn-action btn-lg">
+                    <i class="bi bi-check-circle"></i> Salvează Task-ul
+                </button>
+                <a asp-action="Index" class="btn btn-secondary-custom btn-action btn-lg">
+                    <i class="bi bi-x-circle"></i> Anulează
+                </a>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

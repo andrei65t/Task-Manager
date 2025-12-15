@@ -34,6 +34,8 @@ services:
       - ./:/src
       - nugetstorevolume:/root/.nuget/packages
       - dotnet-toolsstorevolume:/root/.dotnet/tools
+      - /src/TaskManager/bin
+      - /src/TaskManager/obj
     # după ce generăm proiectul, setăm directorul de lucru în subfolderul proiectului
     working_dir: /src/${DOCKER_PROJECT_NAME:-TaskManager}
     command: ["sh", "-c", "export PATH=/root/.dotnet/tools:$$PATH && dotnet watch --non-interactive run --urls http://0.0.0.0:8080"]

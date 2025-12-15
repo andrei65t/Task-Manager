@@ -17,3 +17,7 @@ Thumbs.db
 
 # --- Diverse ---
 *.log
+.idea/
+task-manager.sln
+
+TaskManager/wwwroot/images/

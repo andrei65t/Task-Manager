@@ -1,0 +1,144 @@
+@model IEnumerable<TaskManager.Models.ProjectTask>
+
+@{ ViewData["Title"] = "Tasks List"; }
+
+<div class="container mt-5 mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-5 fade-in-up">
+        <h1 class="page-title">
+            <i class="bi bi-list-task"></i> Toate Task-urile
+        </h1>
+        <a asp-action="New" class="btn btn-success-custom btn-action btn-lg">
+            <i class="bi bi-plus-circle"></i> Adaugă Task Nou
+        </a>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow fade-in-up" style="border-radius: 15px; border: none;">
+            <i class="bi bi-check-circle-fill"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    }
+
+    <div class="row g-4">
+        @foreach (var task in Model)
+        {
+            <div class="col-md-4 fade-in-up">
+                <div class="task-card">
+                    @if (!string.IsNullOrEmpty(task.MediaUrl))
+                    {
+                        if (task.MediaUrl.StartsWith("/images/"))
+                        {
+                            <img src="@task.MediaUrl" class="task-media-preview" alt="@task.Title" style="height: 220px; width: 100%; object-fit: cover; border-radius: 15px 15px 0 0; margin-bottom: 0;">
+                        }
+                        else
+                        {
+                            <div class="ratio ratio-16x9" style="border-radius: 15px 15px 0 0; overflow: hidden; margin-bottom: 0;">
+                                <iframe src="@task.MediaUrl" allowfullscreen></iframe>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="d-flex align-items-center justify-content-center bg-light" style="height: 220px; border-radius: 15px 15px 0 0;">
+                            <i class="bi bi-image text-muted" style="font-size: 3rem;"></i>
+                        </div>
+                    }
+
+                    <div class="task-card-header">
+                        <h5 class="task-card-title" title="@task.Title">
+                            <i class="bi bi-check2-square"></i> @task.Title
+                        </h5>
+                    </div>
+
+                    <div class="task-card-body">
+                        <p class="task-description">
+                            @(task.Description?.Length > 100 
+                                ? task.Description.Substring(0, 100) + "..." 
+                                : task.Description)
+                        </p>
+
+                        <div class="task-meta">
+                            <span class="task-date">
+                                <i class="bi bi-calendar-event"></i> @task.StartDate.ToString("dd MMM yyyy")
+                            </span>
+                            <span class="task-date">
+                                <i class="bi bi-flag-fill"></i> @task.EndDate.ToString("dd MMM yyyy")
+                            </span>
+                        </div>
+
+                        <div class="text-center mt-3">
+                            <div class="dropdown">
+                                <button class="status-badge status-@(task.Status.ToString().ToLower()) dropdown-toggle border-0" 
+                                        type="button" 
+                                        data-bs-toggle="dropdown" 
+                                        aria-expanded="false"
+                                        style="cursor: pointer;">
+                                    @(task.Status == TaskManager.Models.TaskStatus.NotStarted ? "Neînceput" :
+                                      task.Status == TaskManager.Models.TaskStatus.InProgress ? "În Progres" :
+                                      "Finalizat")
+                                </button>
+                                <ul class="dropdown-menu shadow" style="border-radius: 10px;">
+                                    @if (task.Status != TaskManager.Models.TaskStatus.NotStarted)
+                                    {
+                                        <li>
+                                            <form asp-action="ChangeStatus" asp-route-id="@task.Id" method="post" class="d-inline">
+                                                <input type="hidden" name="newStatus" value="@TaskManager.Models.TaskStatus.NotStarted" />
+                                                <button type="submit" class="dropdown-item">
+                                                    <span class="status-badge status-notstarted d-inline-block" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+                                                        Neînceput
+                                                    </span>
+                                                </button>
+                                            </form>
+                                        </li>
+                                    }
+                                    @if (task.Status != TaskManager.Models.TaskStatus.InProgress)
+                                    {
+                                        <li>
+                                            <form asp-action="ChangeStatus" asp-route-id="@task.Id" method="post" class="d-inline">
+                                                <input type="hidden" name="newStatus" value="@TaskManager.Models.TaskStatus.InProgress" />
+                                                <button type="submit" class="dropdown-item">
+                                                    <span class="status-badge status-inprogress d-inline-block" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+                                                        În Progres
+                                                    </span>
+                                                </button>
+                                            </form>
+                                        </li>
+                                    }
+                                    @if (task.Status != TaskManager.Models.TaskStatus.Completed)
+                                    {
+                                        <li>
+                                            <form asp-action="ChangeStatus" asp-route-id="@task.Id" method="post" class="d-inline">
+                                                <input type="hidden" name="newStatus" value="@TaskManager.Models.TaskStatus.Completed" />
+                                                <button type="submit" class="dropdown-item">
+                                                    <span class="status-badge status-completed d-inline-block" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">
+                                                        Finalizat
+                                                    </span>
+                                                </button>
+                                            </form>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="task-card-footer d-flex justify-content-between flex-wrap gap-2">
+                        <a asp-action="Show" asp-route-id="@task.Id" class="btn btn-sm btn-primary-custom btn-action">
+                            <i class="bi bi-eye"></i> Vezi
+                        </a>
+                        <a asp-action="Edit" asp-route-id="@task.Id" class="btn btn-sm btn-warning-custom btn-action">
+                            <i class="bi bi-pencil"></i> Editează
+                        </a>
+                        <form asp-action="Delete" asp-route-id="@task.Id" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-danger-custom btn-action" 
+                                    onclick="return confirm('Ești sigur că vrei să ștergi acest task?')">
+                                <i class="bi bi-trash"></i> Șterge
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
