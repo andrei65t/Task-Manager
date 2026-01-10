@@ -25,9 +25,20 @@ namespace TaskManager.Controllers
             var userId = _userManager.GetUserId(User);
             var projects = await _context.Projects
                 .Include(p => p.Members)
+                .Include(p => p.Creator)
                 .Where(p => p.CreatorId == userId || p.Members.Any(m => m.Id == userId))
                 .ToListAsync();
             return View(projects);
+        }
+
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> AdminIndex()
+        {
+            var allProjects = await _context.Projects
+                .Include(p => p.Members)
+                .Include(p => p.Creator)
+                .ToListAsync();
+            return View(allProjects);
         }
 
         public async Task<IActionResult> Details(int? id)
@@ -37,7 +48,7 @@ namespace TaskManager.Controllers
             var project = await _context.Projects
                 .Include(p => p.Creator)
                 .Include(p => p.Members)
-                .Include(p => p.ProjectTasks) // Asta incarca task-urile
+                .Include(p => p.ProjectTasks)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (project == null) return NotFound();
@@ -76,7 +87,8 @@ namespace TaskManager.Controllers
             if (project == null) return NotFound();
 
             var userId = _userManager.GetUserId(User);
-            if (project.CreatorId != userId) return Forbid();
+
+            if (project.CreatorId != userId && !User.IsInRole("Admin")) return Forbid();
 
             return View(project);
         }
@@ -90,7 +102,8 @@ namespace TaskManager.Controllers
             var existingProject = await _context.Projects.AsNoTracking().FirstOrDefaultAsync(p => p.Id == id);
 
             if (existingProject == null) return NotFound();
-            if (existingProject.CreatorId != userId) return Forbid();
+
+            if (existingProject.CreatorId != userId && !User.IsInRole("Admin")) return Forbid();
 
             project.CreatorId = existingProject.CreatorId;
             project.DateCreated = existingProject.DateCreated;
@@ -118,7 +131,8 @@ namespace TaskManager.Controllers
             if (project == null) return NotFound();
 
             var userId = _userManager.GetUserId(User);
-            if (project.CreatorId != userId) return Forbid();
+
+            if (project.CreatorId != userId && !User.IsInRole("Admin")) return Forbid();
 
             return View(project);
         }
@@ -129,6 +143,10 @@ namespace TaskManager.Controllers
             var project = await _context.Projects.FindAsync(id);
             if (project != null)
             {
+                var userId = _userManager.GetUserId(User);
+
+                if (project.CreatorId != userId && !User.IsInRole("Admin")) return Forbid();
+
                 _context.Projects.Remove(project);
                 await _context.SaveChangesAsync();
             }
@@ -142,7 +160,8 @@ namespace TaskManager.Controllers
             if (project == null) return NotFound();
 
             var currentUserId = _userManager.GetUserId(User);
-            if (project.CreatorId != currentUserId) return Forbid();
+
+            if (project.CreatorId != currentUserId && !User.IsInRole("Admin")) return Forbid();
 
             var userToAdd = await _userManager.FindByEmailAsync(email);
 
@@ -167,7 +186,8 @@ namespace TaskManager.Controllers
             if (project == null) return NotFound();
 
             var currentUserId = _userManager.GetUserId(User);
-            if (project.CreatorId != currentUserId) return Forbid();
+
+            if (project.CreatorId != currentUserId && !User.IsInRole("Admin")) return Forbid();
 
             var userToRemove = project.Members.FirstOrDefault(u => u.Id == userId);
             if (userToRemove != null)
@@ -175,6 +195,10 @@ namespace TaskManager.Controllers
                 project.Members.Remove(userToRemove);
                 await _context.SaveChangesAsync();
                 TempData["Message"] = "Membru sters din proiect.";
+            }
+            else
+            {
+                TempData["Error"] = "Membru nu a fost gasit.";
             }
 
             return RedirectToAction(nameof(Details), new { id = projectId });

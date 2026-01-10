@@ -7,7 +7,7 @@ using TaskManager.Models;
 
 namespace TaskManager.Controllers
 {
-    [Authorize] 
+    [Authorize]
     public class CommentsController : Controller
     {
         private readonly ApplicationDbContext db;
@@ -19,12 +19,10 @@ namespace TaskManager.Controllers
             this.userManager = userManager;
         }
 
-        
         [HttpPost]
         public IActionResult New(Comment comment)
         {
             comment.DateAdded = DateTime.Now;
-            
             var userId = userManager.GetUserId(User);
             comment.UserId = userId;
 
@@ -32,7 +30,6 @@ namespace TaskManager.Controllers
             {
                 db.Comments.Add(comment);
                 db.SaveChanges();
-                
                 return RedirectToAction("Show", "Tasks", new { id = comment.ProjectTaskId });
             }
 
@@ -43,13 +40,14 @@ namespace TaskManager.Controllers
         public IActionResult Edit(int id)
         {
             var comment = db.Comments.Find(id);
-            
-            if (comment == null)
-                return NotFound();
-            
-            if (comment.UserId != userManager.GetUserId(User))
+
+            if (comment == null) return NotFound();
+
+            if (comment.UserId != userManager.GetUserId(User) && !User.IsInRole("Admin"))
+            {
                 return Forbid();
-            
+            }
+
             return View(comment);
         }
 
@@ -57,21 +55,21 @@ namespace TaskManager.Controllers
         public IActionResult Edit(int id, Comment requestComment)
         {
             var comment = db.Comments.Find(id);
-            
-            if (comment == null)
-                return NotFound();
-            
-            if (comment.UserId != userManager.GetUserId(User))
+
+            if (comment == null) return NotFound();
+
+            if (comment.UserId != userManager.GetUserId(User) && !User.IsInRole("Admin"))
+            {
                 return Forbid();
-            
+            }
+
             if (ModelState.IsValid)
             {
                 comment.Content = requestComment.Content;
                 db.SaveChanges();
-                
                 return RedirectToAction("Show", "Tasks", new { id = comment.ProjectTaskId });
             }
-            
+
             return View(comment);
         }
 
@@ -79,8 +77,10 @@ namespace TaskManager.Controllers
         public IActionResult Delete(int id)
         {
             var comment = db.Comments.Find(id);
-            
-            if (comment != null && comment.UserId == userManager.GetUserId(User)) 
+
+            if (comment == null) return NotFound();
+
+            if (comment.UserId == userManager.GetUserId(User) || User.IsInRole("Admin"))
             {
                 var taskId = comment.ProjectTaskId;
                 db.Comments.Remove(comment);

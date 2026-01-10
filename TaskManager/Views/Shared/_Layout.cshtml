@@ -1,4 +1,8 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<TaskManager.Areas.Identity.Data.ApplicationUser> SignInManager
+@inject UserManager<TaskManager.Areas.Identity.Data.ApplicationUser> UserManager
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -6,6 +10,7 @@
     <title>@ViewData["Title"] - TaskManager</title>
     <script type="importmap"></script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/TaskManager.styles.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
@@ -24,6 +29,24 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Projects" asp-action="Index">Proiecte</a>
+                        </li>
+
+                        @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-danger fw-bold" asp-controller="Projects" asp-action="AdminIndex">
+                                    <i class="bi bi-folder-symlink"></i> Toate Proiectele
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger fw-bold" asp-area="" asp-controller="Users" asp-action="Index">
+                                    <i class="bi bi-shield-lock"></i> Panou Admin
+                                </a>
+                            </li>
+                        }
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>

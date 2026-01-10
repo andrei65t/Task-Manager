@@ -1,0 +1,62 @@
+﻿@model IEnumerable<TaskManager.Controllers.UserViewModel>
+
+@{
+    ViewData["Title"] = "Gestionare Utilizatori";
+}
+
+<div class="container mt-4">
+    <h2><i class="bi bi-people-fill"></i> Gestionare Utilizatori</h2>
+    <hr />
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover align-middle mb-0 bg-white">
+            <thead class="bg-light">
+                <tr>
+                    <th>Utilizator</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th class="text-end">Acțiuni</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var user in Model)
+                {
+                    <tr class="@(user.IsBanned ? "table-danger" : "")">
+                        <td>
+                            <div class="fw-bold">@user.UserName</div>
+                            <small class="text-muted">ID: @user.Id</small>
+                        </td>
+                        <td>@user.Email</td>
+                        <td>
+                            @if (user.IsBanned)
+                            {
+                                <span class="badge bg-dark">BANNED</span>
+                            }
+                            else if (user.IsAdmin)
+                            {
+                                <span class="badge bg-danger">ADMIN</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">Membru</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <form asp-action="ToggleBan" asp-route-id="@user.Id" method="post" style="display:inline-block">
+                                <button type="submit" class="btn btn-sm @(user.IsBanned ? "btn-success" : "btn-dark")">
+                                    @(user.IsBanned ? "Debaneaza" : "Baneaza")
+                                </button>
+                            </form>
+
+                            <form asp-action="Delete" asp-route-id="@user.Id" method="post" style="display:inline-block" onsubmit="return confirm('Esti sigur ca vrei sa stergi acest utilizator?');">
+                                <button type="submit" class="btn btn-sm btn-outline-danger ms-1">
+                                    <i class="bi bi-trash"></i> Sterge
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -3,7 +3,7 @@
 @{
     ViewData["Title"] = "Detalii Proiect";
     var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-    var isOrganizer = Model.CreatorId == currentUserId;
+    var isOrganizer = (Model.CreatorId == currentUserId) || User.IsInRole("Admin");
 }
 
 <div class="container mt-4">

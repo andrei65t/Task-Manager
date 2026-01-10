@@ -1,0 +1,50 @@
+﻿@model IEnumerable<TaskManager.Models.Project>
+
+@{
+    ViewData["Title"] = "Toate Proiectele";
+}
+
+<div class="container mt-4">
+    <h2 class="text-danger"><i class="bi bi-folder-fill"></i> Administrare Proiecte</h2>
+    <hr />
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover align-middle mb-0 bg-white">
+            <thead class="bg-light">
+                <tr>
+                    <th>Titlu Proiect</th>
+                    <th>Creat de</th>
+                    <th>Data</th>
+                    <th>Membri</th>
+                    <th class="text-end">Acțiuni</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="fw-bold">@item.Title</td>
+                        <td>
+                            <span class="badge bg-info text-dark">@item.Creator?.UserName</span>
+                        </td>
+                        <td>@item.DateCreated.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            <span class="badge bg-secondary">@item.Members.Count</span>
+                        </td>
+                        <td class="text-end">
+                            <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger">
+                                <i class="bi bi-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

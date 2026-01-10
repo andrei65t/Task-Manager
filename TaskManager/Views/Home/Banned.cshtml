@@ -1,0 +1,42 @@
+﻿@{
+    ViewData["Title"] = "Cont Blocat";
+    Layout = null; // Fara meniu, fara nimic. Doar mesajul.
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            font-family: sans-serif;
+        }
+
+        h1 {
+            font-size: 5rem;
+            color: #dc3545;
+            font-weight: bold;
+        }
+
+        p {
+            font-size: 1.5rem;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div>
+        <h1>YOU ARE BANNED</h1>
+        <p>Accesul tau la aceasta aplicatie a fost restrictionat de un administrator.</p>
+        <br />
+        <a href="/" class="btn btn-outline-light">Oncearca sa te loghezi cu alt cont</a>
+    </div>
+</body>
+</html>

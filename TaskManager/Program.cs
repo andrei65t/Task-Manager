@@ -38,6 +38,30 @@ app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity.IsAuthenticated)
+    {
+        var userManager = context.RequestServices.GetRequiredService<UserManager<TaskManager.Areas.Identity.Data.ApplicationUser>>();
+        var signInManager = context.RequestServices.GetRequiredService<SignInManager<TaskManager.Areas.Identity.Data.ApplicationUser>>();
+
+        var user = await userManager.GetUserAsync(context.User);
+
+        if (user != null && user.LockoutEnd > DateTimeOffset.Now)
+        {
+            if (!context.Request.Path.Value.Contains("/Home/Banned"))
+            {
+                await signInManager.SignOutAsync();
+
+                context.Response.Redirect("/Home/Banned");
+                return; 
+            }
+        }
+    }
+
+    await next();
+});
+
 app.MapStaticAssets();
 
 app.MapControllerRoute(
