@@ -23,7 +23,7 @@ task-manager.sln
 # --- Media ---
 TaskManager/wwwroot/images/
 
-# --- Configurare / Securitate (CRITIC) ---
+# --- Configurare / Securitate ---
 .config/
 appsettings.json
 appsettings.Development.json
