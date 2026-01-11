@@ -51,6 +51,19 @@ public static class SeedData
                     Email = "member@test.com",
                     NormalizedUserName = "MEMBER@TEST.COM",
                     PasswordHash = hasher.HashPassword(new ApplicationUser(), "Member1!")
+                },
+
+                new ApplicationUser
+
+                {
+
+                    Id = "d3f5e8c1-3b6e-4f4a-9f4a-1c2e3d4f5a6b",
+                    UserName = "tester@test.com",
+                    EmailConfirmed = true,
+                    NormalizedEmail = "TESTER@TEST.COM",
+                    Email = "tester@test.com",
+                    NormalizedUserName = "TESTER@TEST.COM",
+                    PasswordHash = hasher.HashPassword(new ApplicationUser(), "Tester1!")
                 }
             );
             context.UserRoles.AddRange(
@@ -78,12 +91,35 @@ public static class SeedData
                     Description = "Acesta este proiectul de seed pentru task-urile inițiale.",
                     CreatorId = "80cd74b1-da1e-48e7-a79a-cdd3cad6e7a8",
                     DateCreated = DateTime.Now
+                },
+                new Project
+                {
+                    Title = "Platformă Web Admin",
+                    Description = "Dezvoltare și mentenanță platformă web pentru admin.",
+                    CreatorId = "80cd74b1-da1e-48e7-a79a-cdd3cad6e7a8",
+                    DateCreated = DateTime.Now.AddDays(-5)
+                },
+                new Project
+                {
+                    Title = "Aplicație Mobile",
+                    Description = "Dezvoltare aplicație mobilă cross-platform pentru task management.",
+                    CreatorId = "5b54ca8a-aba8-49bd-9a6e-503ae66fd5d1",
+                    DateCreated = DateTime.Now.AddDays(-3)
                 }
             );
             context.SaveChanges();
 
-            var seedProject = context.Projects.FirstOrDefault(p => p.Title == "Proiect Inițial");
+            var seedProject = context.Projects
+                .Include(p => p.Members)
+                .FirstOrDefault(p => p.Title == "Proiect Inițial");
             if (seedProject == null) return;
+
+            var memberUser = context.Users.FirstOrDefault(u => u.Id == "5b54ca8a-aba8-49bd-9a6e-503ae66fd5d1");
+            if (memberUser != null && !seedProject.Members.Any(m => m.Id == memberUser.Id))
+            {
+                seedProject.Members.Add(memberUser);
+                context.SaveChanges();
+            }
 
             context.ProjectTasks.AddRange(
                 new ProjectTask
@@ -121,6 +157,113 @@ public static class SeedData
             );
                             
             context.SaveChanges();
+
+            var adminProject = context.Projects.FirstOrDefault(p => p.Title == "Platformă Web Admin");
+            if (adminProject != null)
+            {
+                context.ProjectTasks.AddRange(
+                    new ProjectTask
+                    {
+                        Title = "Design sistem autentificare",
+                        Description = "Implementare sistem de login cu ASP.NET Identity.",
+                        Status = TaskManager.Models.TaskStatus.Completed,
+                        StartDate = DateTime.Now.AddDays(-5),
+                        EndDate = DateTime.Now.AddDays(-2),
+                        AssignedUserId = "80cd74b1-da1e-48e7-a79a-cdd3cad6e7a8",
+                        ProjectId = adminProject.Id
+                    },
+                    new ProjectTask
+                    {
+                        Title = "Configurare baze de date",
+                        Description = "Setare și optimizare baze de date pentru aplicație.",
+                        Status = TaskManager.Models.TaskStatus.InProgress,
+                        StartDate = DateTime.Now.AddDays(-3),
+                        EndDate = DateTime.Now.AddDays(4),
+                        MediaUrl = "/images/db.jpg",
+                        AssignedUserId = "80cd74b1-da1e-48e7-a79a-cdd3cad6e7a8",
+                        ProjectId = adminProject.Id
+                    },
+                    new ProjectTask
+                    {
+                        Title = "Testare funcționalități",
+                        Description = "Testare completă a tuturor funcționalităților aplicației.",
+                        Status = TaskManager.Models.TaskStatus.NotStarted,
+                        StartDate = DateTime.Now,
+                        EndDate = DateTime.Now.AddDays(7),
+                        AssignedUserId = "80cd74b1-da1e-48e7-a79a-cdd3cad6e7a8",
+                        ProjectId = adminProject.Id
+                    },
+                    new ProjectTask
+                    {
+                        Title = "Optimizare performanță",
+                        Description = "Îmbunătățirea vitezei și performanței aplicației web.",
+                        Status = TaskManager.Models.TaskStatus.NotStarted,
+                        StartDate = DateTime.Now.AddDays(1),
+                        EndDate = DateTime.Now.AddDays(10),
+                        AssignedUserId = "80cd74b1-da1e-48e7-a79a-cdd3cad6e7a8",
+                        ProjectId = adminProject.Id
+                    }
+                );
+                context.SaveChanges();
+            }
+
+            var mobileProject = context.Projects
+                .Include(p => p.Members)
+                .FirstOrDefault(p => p.Title == "Aplicație Mobile");
+            if (mobileProject != null)
+            {
+                var adminProjectMember = context.Users.FirstOrDefault(u => u.Id == "80cd74b1-da1e-48e7-a79a-cdd3cad6e7a8");
+                if (adminProjectMember != null && !mobileProject.Members.Any(m => m.Id == adminProjectMember.Id))
+                {
+                    mobileProject.Members.Add(adminProjectMember);
+                    context.SaveChanges();
+                }
+
+                context.ProjectTasks.AddRange(
+                    new ProjectTask
+                    {
+                        Title = "Design UI/UX",
+                        Description = "Creare design modern și intuitiv pentru aplicația mobilă.",
+                        Status = TaskManager.Models.TaskStatus.Completed,
+                        StartDate = DateTime.Now.AddDays(-7),
+                        EndDate = DateTime.Now.AddDays(-3),
+                        AssignedUserId = "5b54ca8a-aba8-49bd-9a6e-503ae66fd5d1",
+                        ProjectId = mobileProject.Id
+                    },
+                    new ProjectTask
+                    {
+                        Title = "Implementare funcționalități",
+                        Description = "Dezvoltare funcționalități core: autentificare, liste task-uri, notificări.",
+                        Status = TaskManager.Models.TaskStatus.InProgress,
+                        StartDate = DateTime.Now.AddDays(-2),
+                        EndDate = DateTime.Now.AddDays(5),
+                        MediaUrl = "https://www.youtube.com/embed/WBF_ZmjdZ1I",
+                        AssignedUserId = "80cd74b1-da1e-48e7-a79a-cdd3cad6e7a8",
+                        ProjectId = mobileProject.Id
+                    },
+                    new ProjectTask
+                    {
+                        Title = "Testing și debugging",
+                        Description = "Testare aplicație pe multiple dispozitive și rezolvare bug-uri.",
+                        Status = TaskManager.Models.TaskStatus.NotStarted,
+                        StartDate = DateTime.Now.AddDays(3),
+                        EndDate = DateTime.Now.AddDays(8),
+                        AssignedUserId = "5b54ca8a-aba8-49bd-9a6e-503ae66fd5d1",
+                        ProjectId = mobileProject.Id
+                    },
+                    new ProjectTask
+                    {
+                        Title = "Deploy pe store-uri",
+                        Description = "Publicare aplicație pe Google Play și App Store.",
+                        Status = TaskManager.Models.TaskStatus.NotStarted,
+                        StartDate = DateTime.Now.AddDays(6),
+                        EndDate = DateTime.Now.AddDays(12),
+                        AssignedUserId = "80cd74b1-da1e-48e7-a79a-cdd3cad6e7a8",
+                        ProjectId = mobileProject.Id
+                    }
+                );
+                context.SaveChanges();
+            }
                         
         }
         

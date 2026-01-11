@@ -24,8 +24,14 @@ namespace TaskManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
+            var currentUserId = userManager.GetUserId(User);
+            
             var tasks = await db.ProjectTasks
                 .Include(t => t.AssignedUser)
+                .Include(t => t.Project)
+                    .ThenInclude(p => p.Members)
+                .Where(t => t.Project.CreatorId == currentUserId || 
+                            t.Project.Members.Any(m => m.Id == currentUserId))
                 .OrderByDescending(t => t.StartDate)
                 .ToListAsync();
             return View(tasks);
@@ -59,14 +65,12 @@ namespace TaskManager.Controllers
             var currentUserId = userManager.GetUserId(User);
             var isOrganizer = project.CreatorId == currentUserId;
 
-            // Doar organizatorul poate crea task-uri
             if (!isOrganizer)
             {
                 TempData["Error"] = "Doar organizatorul poate crea task-uri noi.";
                 return RedirectToAction("Details", "Projects", new { id = projectId });
             }
 
-            // Lista utilizatorilor - organizator + membri proiectului
             var projectUsers = new List<ApplicationUser> { project.Creator };
             projectUsers.AddRange(project.Members);
             
@@ -94,7 +98,6 @@ namespace TaskManager.Controllers
             var currentUserId = userManager.GetUserId(User);
             var isOrganizer = project.CreatorId == currentUserId;
 
-            // Doar organizatorul poate crea task-uri
             if (!isOrganizer)
             {
                 TempData["Error"] = "Doar organizatorul poate crea task-uri noi.";
@@ -137,14 +140,12 @@ namespace TaskManager.Controllers
             var isOrganizer = task.Project.CreatorId == currentUserId;
             var isAssigned = task.AssignedUserId == currentUserId;
 
-            // Doar organizatori sau utilizatori asignați pot edita
             if (!isOrganizer && !isAssigned)
             {
                 TempData["Error"] = "Nu aveți permisiunea de a edita acest task.";
                 return RedirectToAction("Details", "Projects", new { id = task.ProjectId });
             }
 
-            // Lista de utilizatori pentru dropdown (doar organizatori văd dropdown-ul)
             if (isOrganizer)
             {
                 var projectUsers = new List<ApplicationUser> { task.Project.Creator };
@@ -171,7 +172,6 @@ namespace TaskManager.Controllers
             var isOrganizer = existingTask.Project.CreatorId == currentUserId;
             var isAssigned = existingTask.AssignedUserId == currentUserId;
 
-            // Verifică permisiunile
             if (!isOrganizer && !isAssigned)
             {
                 TempData["Error"] = "Nu aveți permisiunea de a edita acest task.";
@@ -182,7 +182,6 @@ namespace TaskManager.Controllers
 
             if (ModelState.IsValid)
             {
-                // Organizatorii pot modifica totul
                 if (isOrganizer)
                 {
                     existingTask.Title = requestTask.Title;
@@ -192,7 +191,6 @@ namespace TaskManager.Controllers
                     existingTask.EndDate = requestTask.EndDate;
                     existingTask.AssignedUserId = requestTask.AssignedUserId;
 
-                    // Doar organizatorii pot modifica media
                     if (requestTask.TaskImage != null)
                     {
                         if (!string.IsNullOrEmpty(existingTask.MediaUrl) && existingTask.MediaUrl.StartsWith("/images/"))
@@ -213,7 +211,6 @@ namespace TaskManager.Controllers
                         existingTask.MediaUrl = requestTask.MediaUrl;
                     }
                 }
-                // Membrii pot modifica doar statusul
                 else
                 {
                     existingTask.Status = requestTask.Status;
@@ -226,7 +223,6 @@ namespace TaskManager.Controllers
                 return RedirectToAction("Details", "Projects", new { id = existingTask.ProjectId });
             }
 
-            // În caz de eroare, returnează view-ul cu datele necesare
             if (isOrganizer)
             {
                 var projectUsers = new List<ApplicationUser> { existingTask.Project.Creator };
@@ -249,7 +245,6 @@ namespace TaskManager.Controllers
             var currentUserId = userManager.GetUserId(User);
             var isOrganizer = task.Project.CreatorId == currentUserId;
 
-            // Doar organizatorul poate șterge task-uri
             if (!isOrganizer)
             {
                 TempData["Error"] = "Doar organizatorul poate șterge task-uri.";
@@ -287,7 +282,6 @@ namespace TaskManager.Controllers
             var isOrganizer = task.Project.CreatorId == currentUserId;
             var isAssigned = task.AssignedUserId == currentUserId;
 
-            // Doar organizatori sau utilizatori asignați pot schimba statusul
             if (!isOrganizer && !isAssigned)
             {
                 TempData["Error"] = "Nu aveți permisiunea de a modifica statusul acestui task.";

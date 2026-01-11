@@ -26,7 +26,10 @@ namespace TaskManager.Controllers
             
             var query = db.ProjectTasks
                 .Include(t => t.AssignedUser)
-                .Where(t => t.AssignedUserId == currentUserId);
+                .Include(t => t.Project)
+                    .ThenInclude(p => p.Members)
+                .Where(t => t.Project.CreatorId == currentUserId || 
+                            t.Project.Members.Any(m => m.Id == currentUserId));
 
             if (filter == "completed")
             {
@@ -41,7 +44,10 @@ namespace TaskManager.Controllers
             var myTasks = await query.OrderByDescending(t => t.StartDate).ToListAsync();
 
             var allMyTasks = await db.ProjectTasks
-                .Where(t => t.AssignedUserId == currentUserId)
+                .Include(t => t.Project)
+                    .ThenInclude(p => p.Members)
+                .Where(t => t.Project.CreatorId == currentUserId || 
+                            t.Project.Members.Any(m => m.Id == currentUserId))
                 .ToListAsync();
 
             ViewBag.TotalTasks = allMyTasks.Count;

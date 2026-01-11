@@ -266,8 +266,8 @@ h6 { font-size: var(--font-size-base); }
 }
 
 .status-notstarted {
-    background-color: var(--color-bg-tertiary);
-    color: var(--color-text);
+    background-color: #7f8c8d;
+    color: #ffffff;
 }
 
 .status-notstarted::before {

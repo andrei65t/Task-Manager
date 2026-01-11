@@ -63,22 +63,80 @@
         </div>
     </div>
 
-
+    <!-- Filters -->
+    <div class="mb-4">
+        <div class="btn-group" role="group">
+            <a href="@Url.Action("Index")" class="btn @(ViewBag.CurrentFilter == null ? "btn-primary" : "btn-outline-primary")">
+                <i class="bi bi-list-task"></i> Toate
+            </a>
+            <a href="@Url.Action("Index", new { filter = "urgent" })" class="btn @(ViewBag.CurrentFilter == "urgent" ? "btn-danger" : "btn-outline-danger")">
+                <i class="bi bi-exclamation-triangle"></i> Urgente
+            </a>
+            <a href="@Url.Action("Index", new { filter = "completed" })" class="btn @(ViewBag.CurrentFilter == "completed" ? "btn-success" : "btn-outline-success")">
+                <i class="bi bi-check-circle"></i> Finalizate
+            </a>
+        </div>
+    </div>
 
     @if (Model == null || Model.Count == 0)
     {
-        ViewBag.Icon = "📋";
-        ViewBag.Title = "Nu ai task-uri atribuite";
-        ViewBag.Description = "Momentan nu există task-uri atribuite ție. Verifică proiectele tale pentru a vedea task-urile disponibile.";
-        ViewBag.ActionText = "Vezi Proiectele";
-        ViewBag.ActionUrl = Url.Action("Index", "Projects");
+        @if (ViewBag.CurrentFilter == "urgent")
+        {
+            ViewBag.Icon = "⏰";
+            ViewBag.Title = "Nu există task-uri urgente";
+            ViewBag.Description = "Momentan nu există task-uri cu deadline în următoarea zi. Continuă munca bună!";
+            ViewBag.ActionText = "Vezi Toate Task-urile";
+            ViewBag.ActionUrl = Url.Action("Index");
+        }
+        else if (ViewBag.CurrentFilter == "completed")
+        {
+            ViewBag.Icon = "✅";
+            ViewBag.Title = "Nu există task-uri finalizate";
+            ViewBag.Description = "Momentan nu ai finalizat niciun task. Începe să lucrezi la task-urile tale!";
+            ViewBag.ActionText = "Vezi Toate Task-urile";
+            ViewBag.ActionUrl = Url.Action("Index");
+        }
+        else
+        {
+            ViewBag.Icon = "📋";
+            ViewBag.Title = "Nu ai task-uri atribuite";
+            ViewBag.Description = "Momentan nu există task-uri atribuite ție. Verifică proiectele tale pentru a vedea task-urile disponibile.";
+            ViewBag.ActionText = "Vezi Proiectele";
+            ViewBag.ActionUrl = Url.Action("Index", "Projects");
+        }
         
         <partial name="_EmptyState" />
     }
     else
     {
-        <!-- Kanban Board View -->
-        <div class="kanban-board mb-xl">
+        @if (ViewBag.CurrentFilter == "completed")
+        {
+            <!-- List View for Completed Filter -->
+            <div class="row g-4">
+                @foreach (var task in completedTasks)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <partial name="_TaskCard" model="task" />
+                    </div>
+                }
+            </div>
+        }
+        else if (ViewBag.CurrentFilter == "urgent")
+        {
+            <!-- List View for Urgent Filter -->
+            <div class="row g-4">
+                @foreach (var task in Model)
+                {
+                    <div class="col-md-6 col-lg-4">
+                        <partial name="_TaskCard" model="task" />
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <!-- Kanban Board View (default) -->
+            <div class="kanban-board mb-xl">
             <!-- Not Started Column -->
             <div class="kanban-column">
                 <div class="kanban-column-header">
@@ -163,6 +221,7 @@
                 }
             </div>
         </div>
+        }
     }
     
     <!-- Deadline-uri Apropiate -->
