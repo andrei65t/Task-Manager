@@ -20,6 +20,10 @@ Thumbs.db
 .idea/
 task-manager.sln
 
+# --- Media ---
 TaskManager/wwwroot/images/
 
+# --- Configurare / Securitate (CRITIC) ---
 .config/
+appsettings.json
+appsettings.Development.json
