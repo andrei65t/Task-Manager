@@ -20,8 +20,7 @@ Thumbs.db
 .idea/
 task-manager.sln
 
-# --- Media ---
-TaskManager/wwwroot/images/
+
 
 # --- Configurare / Securitate ---
 .config/

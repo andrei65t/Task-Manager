@@ -49,7 +49,7 @@ namespace TaskManager.Controllers
                 .Include(p => p.Creator)
                 .Include(p => p.Members)
                 .Include(p => p.ProjectTasks)
-                    .ThenInclude(t => t.AssignedUser) // Include și utilizatorul asignat
+                    .ThenInclude(t => t.AssignedUser)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (project == null) return NotFound();
